@@ -1,6 +1,6 @@
 ﻿namespace VidaPlus_SGHSS_backend.Services
 {
-    public class ConsultaService
+    public interface IAuthService
     {
     }
 }

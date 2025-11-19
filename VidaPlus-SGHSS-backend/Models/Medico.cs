@@ -1,10 +1,20 @@
-﻿namespace VidaPlus_SGHSS_backend.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace SGHSS.Models
 {
     public class Medico
     {
-        public int Id { get; set; }
-        public string Nome { get; set; }
-        public string CRM { get; set; }
-        public string Especialidade { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid UserId { get; set; }
+        public Usuario? Usuario { get; set; }
+        public string FullName { get; set; } = null!;
+        public string? Specialty { get; set; }
+        public string? RegistrationNumber { get; set; }
+        public string? Phone { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<Consulta>? Consulta { get; set; }
+        public ICollection<Prontuairo>? Prontuairos { get; set; }
     }
 }
