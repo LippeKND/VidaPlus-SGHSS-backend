@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SGHSS.Models
+namespace VidaPlus_SGHSS_backend.Models
 {
-    public enum UserRole { Admin, Professional, Patient }
+    public enum UserRole { Admin, Medico, Paciente }
 
     public class Usuario
 

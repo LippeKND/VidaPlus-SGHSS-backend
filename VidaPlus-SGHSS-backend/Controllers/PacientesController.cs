@@ -1,39 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
 using VidaPlus_SGHSS_backend.Data;
 using VidaPlus_SGHSS_backend.Models;
 
-namespace VidaPlus_SGHSS_backend.Controllers
+namespace SGHSS.Controllers
 {
-    public class PacientesController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PacientesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _db;
+        public PacientesController(AppDbContext db) { _db = db; }
 
-        public PacientesController(AppDbContext context)
-        {
-            _context = context;
-        }
+        [HttpGet]
+        [Authorize(Roles = "Admin,Professional")]
+        public async Task<IActionResult> GetAll() => Ok(await _db.Pacientes.ToListAsync());
 
-        public IActionResult Index()
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(Guid id)
         {
-            var lista = _context.Pacientes.ToList();
-            return View(lista);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
+            var p = await _db.Pacientes.FindAsync(id);
+            if (p == null) return NotFound();
+            return Ok(p);
         }
 
         [HttpPost]
-        public IActionResult Create(Paciente paciente)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([FromBody] Paciente paciente)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Pacientes.Add(paciente);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(paciente);
+            _db.Pacientes.Add(paciente);
+            await _db.SaveChangesAsync();
+            return CreatedAtAction(nameof(Get), new { id = paciente.Id }, paciente);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Professional")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] Paciente update)
+        {
+            var p = await _db.Pacientes.FindAsync(id);
+            if (p == null) return NotFound();
+            p.FullName = update.FullName;
+            p.Phone = update.Phone;
+            p.Address = update.Address;
+            p.ConsentLgpd = update.ConsentLgpd;
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var p = await _db.Pacientes.FindAsync(id);
+            if (p == null) return NotFound();
+            _db.Pacientes.Remove(p);
+            await _db.SaveChangesAsync();
+            return NoContent();
         }
     }
+}
 
