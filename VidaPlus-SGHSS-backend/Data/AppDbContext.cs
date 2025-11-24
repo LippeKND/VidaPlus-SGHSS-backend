@@ -1,26 +1,48 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using VidaPlus.Api.Models;
 using VidaPlus_SGHSS_backend.Models;
 
-namespace VidaPlus.Api.Data
+namespace VidaPlus_SGHSS_backend.Data
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Usuario> Usuario { get; set; }
-        public DbSet<Paciente> Patients { get; set; }
-        public DbSet<Professional> Professionals { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<MedicalRecord> MedicalRecords { get; set; }
-        public DbSet<Prescription> Prescriptions { get; set; }
-        public DbSet<Teleconsultation> Teleconsultations { get; set; }
-        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Usuario> Usuarios => Set<Usuario>();
+        public DbSet<Paciente> Pacientes => Set<Paciente>();
+        public DbSet<Medico> Medicos => Set<Medico>();
+        public DbSet<Unidade> Unidade => Set<Unidade>();
+        public DbSet<Consulta> Consultas => Set<Consulta>();
+        public DbSet<Prontuairo> Prontuairos => Set<Prontuairo>();
+        public DbSet<Receita> Receitas => Set<Receita>();
+        public DbSet<Leito> Leitos => Set<Leito>();
+        public DbSet<Internacao> Internacaos => Set<Internacao>();
+        public DbSet<LogsAuditoria> LogsAuditorias => Set<LogsAuditoria>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // indexes, constraints, etc.
-            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Usuario>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Paciente>()
+                .HasOne(p => p.Usario).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Medico>()
+                .HasOne(p => p.Usuario).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Consulta>()
+                .HasOne(a => a.Paciente).WithMany(p => p.Consultas).HasForeignKey(a => a.PacienteId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Prontuairo>()
+                .HasOne(m => m.Paciente).WithMany(p => p.Prontuairos).HasForeignKey(m => m.PacienteId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Receita>()
+                .HasOne(pr => pr.Prontuairo).WithMany(m => m.Receitas).HasForeignKey(pr => pr.Prontuairo).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Internacao>()
+                .HasOne(ad => ad.Paciente).WithMany(p => p.Internacoes).HasForeignKey(ad => ad.PacienteId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Leito>()
+                .HasOne(b => b.Unidades).WithMany(u => u.Leitos).HasForeignKey(b => b.UnitId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

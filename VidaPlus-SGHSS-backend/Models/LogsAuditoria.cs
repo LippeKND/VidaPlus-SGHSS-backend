@@ -1,7 +1,8 @@
 ﻿using System;
 
-namespace SGHSS.Models
+namespace VidaPlus_SGHSS_backend.Models
 {
+
     public class LogsAuditoria
     {
         public long Id { get; set; }
