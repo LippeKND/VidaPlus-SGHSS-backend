@@ -1,14 +1,14 @@
-﻿namespace SGHSS.Models
+﻿namespace VidaPlus_SGHSS_backend.Models
 {
     public class Consulta   
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public Guid PatientId { get; set; }
+        public Guid PacienteId { get; set; }
         public Paciente? Paciente  { get; set; }
         public Guid? ProfessionalId { get; set; }
         public Medico? Medico { get; set; }
         public Guid? UnitId { get; set; }
-        public Unit? Unit { get; set; }
+        public Unidade? Unidade { get; set; }
 
         public string Type { get; set; } = "presential"; // presential|telemedicine|exam
         public string Status { get; set; } = "scheduled";

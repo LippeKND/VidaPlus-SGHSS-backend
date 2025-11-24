@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SGHSS.Models
-{
-    public class Unidade
+namespace VidaPlus_SGHSS_backend.Models
+{ 
+
+public class Unidade
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = null!;

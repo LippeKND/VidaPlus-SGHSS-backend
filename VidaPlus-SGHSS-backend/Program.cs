@@ -2,35 +2,34 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using VidaPlus.Api.Data;
-using VidaPlus.Api.Services;
 using VidaPlus_SGHSS_backend.Data;
-using VidaPlus_SGHSS_backend.Services;
+using VidaPlus_SGHSS_backend.Service;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DbContext
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IPatientService, PatientService>();
-builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<IEncryptionService, EncryptionService>();
-builder.Services.AddScoped<IAuditService, AuditService>();
 
-// JWT Auth
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(options => {
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+builder.Services.AddAuthentication(options =>
+{
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options => {
+.AddJwtBearer(options =>
+{
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
@@ -38,13 +37,21 @@ builder.Services.AddAuthentication(options => {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateLifetime = true
     };
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    SeedData.EnsureSeedData(db);
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -55,6 +62,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.Run();

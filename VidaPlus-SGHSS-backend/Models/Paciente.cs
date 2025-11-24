@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SGHSS.Models
+namespace VidaPlus_SGHSS_backend.Models
 {
     public class Paciente   
     {
