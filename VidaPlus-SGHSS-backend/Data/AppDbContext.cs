@@ -12,7 +12,7 @@ namespace VidaPlus_SGHSS_backend.Data
         public DbSet<Medico> Medicos => Set<Medico>();
         public DbSet<Unidade> Unidade => Set<Unidade>();
         public DbSet<Consulta> Consultas => Set<Consulta>();
-        public DbSet<Prontuario> Prontuairos => Set<Prontuario>();
+        public DbSet<Prontuario> Prontuarios => Set<Prontuario>();
         public DbSet<Receita> Receitas => Set<Receita>();
         public DbSet<Leito> Leitos => Set<Leito>();
         public DbSet<Internacao> Internacaos => Set<Internacao>();
