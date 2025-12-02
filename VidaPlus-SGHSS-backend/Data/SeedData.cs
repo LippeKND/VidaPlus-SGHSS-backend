@@ -32,7 +32,7 @@ namespace VidaPlus_SGHSS_backend.Data
             db.Consultas.Add(appt);
             db.SaveChanges();
 
-            var prontuairo = new Prontuairo { PacienteId = paciente.Id, ProfessionalId = medico.Id, ConsultaId = appt.Id, Note = "Queixa de dor no peito", Diagnosis = "A confirmar" };
+            var prontuairo = new Prontuario { PacienteId = paciente.Id, ProfessionalId = medico.Id, ConsultaId = appt.Id, Note = "Queixa de dor no peito", Diagnosis = "A confirmar" };
             db.Prontuairos.Add(prontuairo);
             db.SaveChanges();
 

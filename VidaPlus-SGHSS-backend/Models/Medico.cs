@@ -15,6 +15,6 @@ namespace VidaPlus_SGHSS_backend.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Consulta>? Consulta { get; set; }
-        public ICollection<Prontuairo>? Prontuairos { get; set; }
+        public ICollection<Prontuario>? Prontuarios { get; set; }
     }
 }

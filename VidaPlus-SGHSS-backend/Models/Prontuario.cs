@@ -1,7 +1,7 @@
 ﻿
 namespace VidaPlus_SGHSS_backend.Models
 {
-    public class Prontuairo
+    public class Prontuario
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid PacienteId { get; set; }

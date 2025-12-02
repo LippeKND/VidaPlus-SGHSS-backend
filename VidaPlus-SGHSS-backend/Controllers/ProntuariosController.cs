@@ -23,7 +23,7 @@ namespace SGHSS.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Professional")]
-        public async Task<IActionResult> Create([FromBody] Prontuairo mr)
+        public async Task<IActionResult> Create([FromBody] Prontuario mr)
         {
             _db.Prontuairos.Add(mr);
             await _db.SaveChangesAsync();

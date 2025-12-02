@@ -12,7 +12,7 @@ namespace VidaPlus_SGHSS_backend.Data
         public DbSet<Medico> Medicos => Set<Medico>();
         public DbSet<Unidade> Unidade => Set<Unidade>();
         public DbSet<Consulta> Consultas => Set<Consulta>();
-        public DbSet<Prontuairo> Prontuairos => Set<Prontuairo>();
+        public DbSet<Prontuario> Prontuarios => Set<Prontuario>();
         public DbSet<Receita> Receitas => Set<Receita>();
         public DbSet<Leito> Leitos => Set<Leito>();
         public DbSet<Internacao> Internacaos => Set<Internacao>();
@@ -21,28 +21,55 @@ namespace VidaPlus_SGHSS_backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Usuario>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
             modelBuilder.Entity<Paciente>()
-                .HasOne(p => p.Usario).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(p => p.Usario)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Medico>()
-                .HasOne(p => p.Usuario).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(m => m.Usuario)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Consulta>()
-                .HasOne(a => a.Paciente).WithMany(p => p.Consultas).HasForeignKey(a => a.PacienteId).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(c => c.Paciente)
+                .WithMany(p => p.Consultas)
+                .HasForeignKey(c => c.PacienteId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Prontuairo>()
-                .HasOne(m => m.Paciente).WithMany(p => p.Prontuairos).HasForeignKey(m => m.PacienteId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Prontuario>()
+                .HasOne(p => p.Paciente)
+                .WithMany(p => p.Prontuarios)
+                .HasForeignKey(p => p.PacienteId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Receita>()
-                .HasOne(pr => pr.Prontuairo).WithMany(m => m.Receitas).HasForeignKey(pr => pr.Prontuairo).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(r => r.Prontuario)
+                .WithMany(p => p.Receitas)
+                .HasForeignKey(r => r.ProntuarioId) 
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Internacao>()
-                .HasOne(ad => ad.Paciente).WithMany(p => p.Internacoes).HasForeignKey(ad => ad.PacienteId).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(i => i.Paciente)
+                .WithMany(p => p.Internacoes)
+                .HasForeignKey(i => i.PacienteId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Leito>()
-                .HasOne(b => b.Unidades).WithMany(u => u.Leitos).HasForeignKey(b => b.UnitId).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(l => l.Unidades)
+                .WithMany(u => u.Leitos)
+                .HasForeignKey(l => l.UnitId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
+
+
+
