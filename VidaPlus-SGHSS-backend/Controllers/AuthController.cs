@@ -1,43 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VidaPlus_SGHSS_backend.Data;
 using VidaPlus_SGHSS_backend.DTos;
 using VidaPlus_SGHSS_backend.Models;
-using VidaPlus_SGHSS_backend.Service;
+using VidaPlus_SGHSS_backend.Services;
 
 namespace VidaPlus_SGHSS_backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly IAuthService _auth;
-        public AuthController(AppDbContext db, IAuthService auth) { _db = db; _auth = auth; }
+        private readonly JwtService _jwt;
 
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterDto dto)
+        public AuthController(AppDbContext db, JwtService jwt)
         {
-            if (_db.Usuarios.Any(u => u.Email == dto.Email)) return Conflict("Email already in use.");
-            var papel = Enum.TryParse<UserRole>(dto.Role, true, out var r) ? r : UserRole.Paciente;
-            var usuario = new Usuario { Email = dto.Email, Senha = BCrypt.Net.BCrypt.HashPassword(dto.Senha), Papel = papel };
-            _db.Usuarios.Add(usuario);
-            _db.SaveChanges();
-
-            // create related entity
-            if (papel == UserRole.Paciente) _db.Pacientes.Add(new Paciente { UserId = usuario.Id, FullName = "Paciente " + dto.Email });
-            if (papel == UserRole.Medico) _db.Medicos.Add(new Medico { UserId = usuario.Id, FullName = "Medico " + dto.Email });
-            _db.SaveChanges();
-
-            return CreatedAtAction(null, new { id = usuario.Id });
+            _db = db;
+            _jwt = jwt;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDto dto)
+        public async Task<ActionResult<AuthResult>> Login(LoginDto dto)
         {
-            var usuario = _db.Usuarios.FirstOrDefault(u => u.Email == dto.Email);
-            if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.Senha)) return Unauthorized();
+            var user = await _db.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
-            var token = _auth.GenerateJwtToken(usuario);
+            if (user == null)
+                return Unauthorized("Email inválido");
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.Senha, user.Senha))
+                return Unauthorized("Senha inválida");
+
+            var token = _jwt.GenerateToken(user.Email, user.Role);
+
             return Ok(new AuthResult(token));
         }
     }
