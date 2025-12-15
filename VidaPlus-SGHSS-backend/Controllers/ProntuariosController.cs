@@ -17,7 +17,7 @@ namespace SGHSS.Controllers
         [Authorize(Roles = "Admin,Professional,Patient")]
         public async Task<IActionResult> GetByPatient(Guid pacienteId)
         {
-            var records = await _db.Prontuairos.Where(m => m.PacienteId == pacienteId).ToListAsync();
+            var records = await _db.Prontuarios.Where(m => m.PacienteId == pacienteId).ToListAsync();
             return Ok(records);
         }
 
@@ -25,7 +25,7 @@ namespace SGHSS.Controllers
         [Authorize(Roles = "Professional")]
         public async Task<IActionResult> Create([FromBody] Prontuario mr)
         {
-            _db.Prontuairos.Add(mr);
+            _db.Prontuarios.Add(mr);
             await _db.SaveChangesAsync();
             _db.LogsAuditorias.Add(new LogsAuditoria{ UserId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value), Action = "CreateMedicalRecord", ResourceType = "MedicalRecord", ResourceId = mr.Id.ToString() });
             await _db.SaveChangesAsync();
